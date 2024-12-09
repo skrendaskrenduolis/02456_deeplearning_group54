@@ -23,3 +23,4 @@ for model in "${single_model_array[@]}"; do
     echo "$model"
     python3 run_models_truthful.py --model_name="$model"
 done
+
