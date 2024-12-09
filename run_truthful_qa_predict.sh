@@ -1,0 +1,50 @@
+#!/bin/sh
+### General options
+### –- specify queue --
+#BSUB -q gpuv100
+### -- specify gpu memory --
+#BSUB -R "select[gpu32gb]"
+### -- set the job Name --
+#BSUB -J truthful_qa_complete
+### -- specify that the cores must be on the same host --
+#BSUB -R "span[hosts=1]"
+### -- ask for number of cores (default: 1) --
+#BSUB -n 10
+### -- Select the resources: 1 gpu in exclusive process mode --
+#BSUB -gpu "num=1:mode=exclusive_process"
+### -- set walltime limit: hh:mm --  maximum 24 hours for GPU-queues right now
+#BSUB -W 05:00
+# request 4GB of system-memory per core
+#BSUB -R "rusage[mem=1GB]"
+### -- specify that we want the job to get killed if it exceeds 3 GB per core/slot --
+#BSUB -M 1GB
+### -- Specify the output and error file. %J is the job-id --
+### -- -o and -e mean append, -oo and -eo mean overwrite --
+#BSUB -oo truthful_qa_complete.out
+#BSUB -eo truthful_qa_complete.err
+# -- end of LSF options --
+
+# Load the cuda module
+module load cuda/12.4
+
+source ~/miniconda3/bin/activate
+conda activate /work3/s222858/deeplearning
+
+export HF_HOME="/work3/s222858/huggingface"
+export HF_HUB_CACHE="/work3/s222858/huggingface/hub"
+
+for file in $(ls $HF_HUB_CACHE | grep 'biomistral_instruct_*'); do
+    echo "$HF_HUB_CACHE/$file"
+    python3 run_models_truthful.py --model_name="$HF_HUB_CACHE/$file"
+done
+
+for file in $(ls $HF_HUB_CACHE | grep 'internistai_biomistral_*'); do
+    echo "$HF_HUB_CACHE/$file"
+    python3 run_models_truthful.py --model_name="$HF_HUB_CACHE/$file"
+done
+
+single_model_array=("models--mistralai--Mistral-7B-Instruct-v0.1" "models--mistralai--Mistral-7B-Instruct-v0.2" "models--BioMistral--BioMistral-7B" "models--internistai--base-7b-v0.2")
+for file in "${single_model_array[@]}"; do
+    echo "$HF_HUB_CACHE/$file"
+    python3 run_models_truthful.py --model_name="$HF_HUB_CACHE/$file"
+done
