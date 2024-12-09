@@ -21,12 +21,12 @@ library(patchwork)
 
 ```{r}
 # load files
-filenames <- list.files("../../dl_project_files/results_TruthfulQA/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames <- list.files("../../results_TruthfulQA/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames
 
 
-filenames_truth <- list.files("../../dl_project_files/results_TruthfulQA_fulltruth/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames_truth <- list.files("../../results_TruthfulQA_fulltruth/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
 ```
@@ -180,7 +180,7 @@ single_model_plot
 
 ```{r}
 dir.create("../plots")
-ggsave(paste("single_model_plot_new", ".eps"), plot = single_model_plot, device = cairo_ps, path = "../plots")
+# ggsave(paste("single_model_plot_new", ".eps"), plot = single_model_plot, device = cairo_ps, path = "../plots")
 ggsave(paste("instruct_merge_plot_new", ".eps"), plot = instruct_merge_plot, device = cairo_ps, path = "../plots")
 ggsave(paste("internist_merge_plot_new", ".eps"), plot = internist_merge_plot, device = cairo_ps, path = "../plots")
 ggsave(paste("instruct02_merge_plot_new", ".eps"), plot = instruct02_merge_plot, device = cairo_ps, path = "../plots")
