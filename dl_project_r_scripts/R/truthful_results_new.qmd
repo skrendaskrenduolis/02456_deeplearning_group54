@@ -190,6 +190,9 @@ ggsave(paste("instruct02_merge_plot_new", ".eps"), plot = instruct02_merge_plot,
 ```{r}
 combined_data_merge |>
       mutate(correct = ifelse(correct_letter == best_prediction, 1, 0)) |>
+      filter(truthful == "QA prompt") |>
+  group_by(`Merged models`) |>
+      summarise(mean = mean(correct)) |>
       filter(truthful == "QA prompt")
 ```
 
