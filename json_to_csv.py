@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-path_list = ["./results_TruthfulQA", "./results_TruthfulQA_fulltruth"]
+path_list = ["./results_TruthfulQA_new", "./results_TruthfulQA_truthful_new"]
 
 for path in path_list:
     for file in os.listdir(path):

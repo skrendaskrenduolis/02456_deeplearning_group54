@@ -6,14 +6,16 @@ import torch
 import argparse
 import pandas as pd
 import os
+import torch.nn.functional as F
 from tqdm import tqdm
 from pqdm.processes import pqdm
-import torch.nn.functional as F
+from random import seed
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaTokenizer, LlamaForCausalLM
 
 # import dataset matched to replicate paper
-from edit_dataset import merged_dataset, merged_dataset_truthful
+# FIX UNRESOLVED IMPORT
+from edit_dataset_improved import merged_dataset, merged_dataset_truthful
 
 parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFormatter)
 parser.add_argument("--model_name", type=str, required=True, help="HuggingFace Hub / Local model name")
@@ -78,70 +80,72 @@ else:
 
 
 torch.set_default_device("cuda")
+for i in range(0,3):
+    ## Run normal variation
+    seed()
+    
+    data_threads = []
 
-## Run normal variation
-data_threads = []
+    with torch.no_grad():    
+        for d in tqdm(merged_dataset):
+        
+            inputs = tokenizer(d[f"formatted_question_choices"], return_tensors = "pt")
 
-with torch.no_grad():    
-    for d in tqdm(merged_dataset):
-       
-        inputs = tokenizer(d[f"formatted_question_choices"], return_tensors = "pt")
+            input_ids = inputs["input_ids"].to("cuda")
+            outputs = model.generate(input_ids, max_new_tokens=1, output_scores=True, return_dict_in_generate=True)
+            data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "classes": d["classes"]})
 
-        input_ids = inputs["input_ids"].to("cuda")
-        outputs = model.generate(input_ids, max_new_tokens=1, output_scores=True, return_dict_in_generate=True)
-        data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "classes": d["classes"]})
+    data_batches = list(divide_chunks(data_threads, THREADS_NBR))
 
-data_batches = list(divide_chunks(data_threads, THREADS_NBR))
+    all_thread_result = pqdm([{"data": db} for db in data_batches], process, n_jobs=THREADS_NBR, argument_type='kwargs')
+    print(all_thread_result)
 
-all_thread_result = pqdm([{"data": db} for db in data_batches], process, n_jobs=THREADS_NBR, argument_type='kwargs')
-print(all_thread_result)
+    all_results = []
+    for thread_result in all_thread_result:
+        all_results.extend(thread_result)
+    print("Total elements processed: ", len(all_results))
 
-all_results = []
-for thread_result in all_thread_result:
-    all_results.extend(thread_result)
-print("Total elements processed: ", len(all_results))
+    dir_name = "./results_TruthfulQA_new"
 
-dir_name = "./results_TruthfulQA"
+    if not os.path.exists(dir_name):
+        # if tmp exists and was not removed, remove it
+        #shutil.rmtree(dir_name)
+        os.mkdir(dir_name)
 
-if not os.path.exists(dir_name):
-    # if tmp exists and was not removed, remove it
-    #shutil.rmtree(dir_name)
-    os.mkdir(dir_name)
-
-with open(f"{dir_name}/results_{short_model_name}_ZeroShot_TruthfulQA_EN.json", 'w') as f_out:
-    json.dump(all_results, f_out)
-
-
-# Run truthful variation
-data_threads = []
-
-#x = 0
-with torch.no_grad():    
-    for d in tqdm(merged_dataset_truthful):
-       
-        inputs = tokenizer(d[f"formatted_question_choices_truth"], return_tensors = "pt")
-
-        input_ids = inputs["input_ids"].to("cuda")
-        outputs = model.generate(input_ids, max_new_tokens=1, output_scores=True, return_dict_in_generate=True)
-        data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "classes": d["classes"]})
+    with open(f"{dir_name}/results_{short_model_name}_{i}.json", 'w') as f_out:
+        json.dump(all_results, f_out)
 
 
-data_batches = list(divide_chunks(data_threads, THREADS_NBR))
+    # Run truthful variation
+    data_threads = []
 
-all_thread_result = pqdm([{"data": db} for db in data_batches], process, n_jobs=THREADS_NBR, argument_type='kwargs')
-print(all_thread_result)
+    #x = 0
+    with torch.no_grad():    
+        for d in tqdm(merged_dataset_truthful):
+        
+            inputs = tokenizer(d[f"formatted_question_choices_truth"], return_tensors = "pt")
 
-all_results = []
-for thread_result in all_thread_result:
-    all_results.extend(thread_result)
-print("Total elements processed: ", len(all_results))
+            input_ids = inputs["input_ids"].to("cuda")
+            outputs = model.generate(input_ids, max_new_tokens=1, output_scores=True, return_dict_in_generate=True)
+            data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "classes": d["classes"]})
 
-dir_name = "./results_TruthfulQA_fulltruth"
 
-if not os.path.exists(dir_name):
-    # if tmp exists and was not removed, remove it
-    #shutil.rmtree(dir_name)
-    os.mkdir(dir_name)
+    data_batches = list(divide_chunks(data_threads, THREADS_NBR))
 
-with open(f"{dir_name}/results_{short_model_name}-fulltruth_ZeroShot_TruthfulQA_EN.json", 'w') as f_out:
-    json.dump(all_results, f_out)
+    all_thread_result = pqdm([{"data": db} for db in data_batches], process, n_jobs=THREADS_NBR, argument_type='kwargs')
+    print(all_thread_result)
+
+    all_results = []
+    for thread_result in all_thread_result:
+        all_results.extend(thread_result)
+    print("Total elements processed: ", len(all_results))
+
+    dir_name = "./results_TruthfulQA_truthful_new"
+
+    if not os.path.exists(dir_name):
+        # if tmp exists and was not removed, remove it
+        #shutil.rmtree(dir_name)
+        os.mkdir(dir_name)
+
+    with open(f"{dir_name}/results_{short_model_name}_{i}_truthful.json", 'w') as f_out:
+        json.dump(all_results, f_out)

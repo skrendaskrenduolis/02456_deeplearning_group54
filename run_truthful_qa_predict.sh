@@ -1,9 +1,9 @@
 #!/bin/sh
 ### General options
 ### –- specify queue --
-#BSUB -q gpuv100
+#BSUB -q gpua100
 ### -- specify gpu memory --
-#BSUB -R "select[gpu32gb]"
+#BSUB -R "select[gpu40gb]"
 ### -- set the job Name --
 #BSUB -J truthful_qa_complete
 ### -- specify that the cores must be on the same host --
@@ -13,7 +13,7 @@
 ### -- Select the resources: 1 gpu in exclusive process mode --
 #BSUB -gpu "num=1:mode=exclusive_process"
 ### -- set walltime limit: hh:mm --  maximum 24 hours for GPU-queues right now
-#BSUB -W 05:00
+#BSUB -W 06:00
 # request 4GB of system-memory per core
 #BSUB -R "rusage[mem=1GB]"
 ### -- specify that we want the job to get killed if it exceeds 3 GB per core/slot --
