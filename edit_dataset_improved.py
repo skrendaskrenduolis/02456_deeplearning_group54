@@ -38,7 +38,7 @@ def get_correct_answer(row):
     # find index of value 1 in the labels list
     correct_index = np.argwhere(labels).flatten()[0]
     
-    # convert index to corresponding letter (A, B, C, etc.)
+    # convert index to corresponding letter (A, B, C, etc)
     correct_answer = chr(65 + correct_index)
     return correct_answer
 
@@ -49,7 +49,7 @@ def get_idk_answer(row):
     # find index of value 1 in the labels list
     idk_index = np.argwhere(labels).flatten()[1]
     
-    # convert index to corresponding letter (A, B, C, etc.)
+    # convert index to corresponding letter (A, B, C, etc)
     idk_answer = chr(65 + idk_index)
     return idk_answer
 
@@ -57,9 +57,10 @@ def generate_classes(row):
     labels = row['mc1_targets']['labels']
     labels = np.append(labels, 1)
     labels_length = len(labels)
-    print(labels_length)
-    # create a list of letters from A to the number of elements in 'labels'
-    return [chr(65 + i) for i in range(labels_length)]  # 65 is the ASCII value for 'A'
+    return [chr(65 + i) for i in range(labels_length)]  
+
+
+
 
 # load dataset (both parts)
 dataset_gen = load_dataset("truthfulqa/truthful_qa", "generation")["validation"]
@@ -94,8 +95,8 @@ merged_df_truthful = merged_df_truthful[merged_df_truthful['category'].isin(filt
 
 print(merged_df.shape)
 print(merged_df_truthful.shape)
-with pd.option_context('display.max_rows', None, 'display.max_colwidth', None):  # more options can be specified also
-    print(merged_df[['classes', 'correct_answer', 'idk_answer']])
+# with pd.option_context('display.max_rows', None, 'display.max_colwidth', None):  # more options can be specified also
+#     print(merged_df[['classes', 'correct_answer', 'idk_answer']])
 
 # convert dataframe back to dataset -- this is used by the predict script
 merged_dataset = Dataset.from_pandas(merged_df)

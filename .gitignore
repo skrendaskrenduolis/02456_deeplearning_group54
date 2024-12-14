@@ -2,3 +2,6 @@ run_truthful_qa_predict_local.sh
 local_truthful_qa_predict.sh
 .Rproj.user
 retired_scripts/
+results_TruthfulQA_new/
+results_TruthfulQA_truthful_new/
+__pycache__/

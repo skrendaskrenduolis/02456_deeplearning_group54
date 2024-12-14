@@ -5,12 +5,13 @@ import json
 import torch
 import argparse
 import pandas as pd
+import numpy as np
 import os
 import torch.nn.functional as F
 from tqdm import tqdm
 from pqdm.processes import pqdm
 from random import seed
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaTokenizer, LlamaForCausalLM
 
 # import dataset matched to replicate paper
@@ -83,7 +84,7 @@ torch.set_default_device("cuda")
 for i in range(0,3):
     ## Run normal variation
     seed()
-    
+
     data_threads = []
 
     with torch.no_grad():    
