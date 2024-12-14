@@ -21,12 +21,12 @@ library(patchwork)
 
 ```{r}
 # load files
-filenames <- list.files("../../results_TruthfulQA/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames <- list.files("../../../dl_project_files/results_TruthfulQA/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames
 
 
-filenames_truth <- list.files("../../results_TruthfulQA_fulltruth/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames_truth <- list.files("../../../dl_project_files/results_TruthfulQA_fulltruth/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
 ```
@@ -186,3 +186,13 @@ ggsave(paste("internist_merge_plot_new", ".eps"), plot = internist_merge_plot, d
 ggsave(paste("instruct02_merge_plot_new", ".eps"), plot = instruct02_merge_plot, device = cairo_ps, path = "../plots")
 
 ```
+
+```{r}
+combined_data_merge |>
+      mutate(correct = ifelse(correct_letter == best_prediction, 1, 0)) |>
+      filter(truthful == "QA prompt") |>
+  group_by(`Merged models`) |>
+      summarise(mean = mean(correct))
+
+```
+
