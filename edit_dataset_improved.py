@@ -82,19 +82,21 @@ merged_df['classes'] = merged_df.apply(generate_classes, axis=1)
 merged_df['question_id'] = range(1, len(merged_df) + 1)
 
 # repeat for above but truthful data
-merged_df_truthful['formatted_question_choices_truth'] = merged_df.apply(format_question_truthful, axis=1)
-merged_df_truthful['correct_answer'] = merged_df.apply(get_correct_answer, axis=1)
-merged_df['idk_answer'] = merged_df.apply(get_idk_answer, axis=1)
-merged_df_truthful['classes'] = merged_df.apply(generate_classes, axis=1)
-merged_df_truthful['question_id'] = range(1, len(merged_df) + 1)
+merged_df_truthful['formatted_question_choices_truth'] = merged_df_truthful.apply(format_question_truthful, axis=1)
+merged_df_truthful['correct_answer'] = merged_df_truthful.apply(get_correct_answer, axis=1)
+merged_df_truthful['idk_answer'] = merged_df_truthful.apply(get_idk_answer, axis=1)
+merged_df_truthful['classes'] = merged_df_truthful.apply(generate_classes, axis=1)
+merged_df_truthful['question_id'] = range(1, len(merged_df_truthful) + 1)
 
 # only select categories related to BioMistral specialty
-filter_categories = ['Health', 'Nutrition', 'Psychology', 'Science', 'Statistics']
+filter_categories = ['Health', 'Nutrition', 'Psychology', 'Science']
 merged_df = merged_df[merged_df['category'].isin(filter_categories)]
 merged_df_truthful = merged_df_truthful[merged_df_truthful['category'].isin(filter_categories)]
 
 print(merged_df.shape)
+print(merged_df.columns)
 print(merged_df_truthful.shape)
+print(merged_df_truthful.columns)
 # with pd.option_context('display.max_rows', None, 'display.max_colwidth', None):  # more options can be specified also
 #     print(merged_df[['classes', 'correct_answer', 'idk_answer']])
 
