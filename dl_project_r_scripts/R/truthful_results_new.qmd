@@ -141,7 +141,8 @@ create_plot_combined <- function(data_name, data_tibble, title_text, subtitle_te
               add = c("mean"),
               label = FALSE, lab.size = 2.5) |>
         facet(facet.by = "question_type") +
-    theme(axis.text.x = element_text(size = 8)) +
+    theme(axis.text.x = element_text(size = 5),
+          axis.text.y = element_text(size = 5)) +
     theme(legend.text = element_text(size = 5), 
           legend.title = element_text(size = 6), 
           legend.key.size = unit(0.1, 'inches'),
@@ -186,6 +187,10 @@ single_model_plot <- create_plot_combined(data_name = filenames_single,
                      title_text = "",
                      subtitle_text = "")
 single_model_plot
+
+m1 <- (single_model_plot / internist_merge_plot)
+
+m2 <- (instruct_merge_plot / instruct02_merge_plot)
 ```
 
 
@@ -195,6 +200,11 @@ ggsave(paste("single_model_plot_new", ".png", sep = ""), plot = single_model_plo
 ggsave(paste("instruct_merge_plot_new", ".png", sep = ""), plot = instruct_merge_plot, path = "../plots")
 ggsave(paste("internist_merge_plot_new", ".png", sep = ""), plot = internist_merge_plot, path = "../plots")
 ggsave(paste("instruct02_merge_plot_new", ".png", sep = ""), plot = instruct02_merge_plot, path = "../plots")
+
+
+ggsave(paste("m1", ".png", sep = ""), plot = m1, path = "../plots")
+ggsave(paste("m2", ".png", sep = ""), plot = m2, path = "../plots")
+
 
 ```
 
@@ -222,7 +232,8 @@ create_plot_combined_truth <- function(data_name, data_tibble, title_text, subti
               add = c("mean"),
               label = FALSE, lab.size = 2.5) |>
         facet(facet.by = "question_type") +
-    theme(axis.text.x = element_text(size = 8)) +
+    theme(axis.text.x = element_text(size = 5),
+          axis.text.y = element_text(size = 5)) +
     theme(legend.text = element_text(size = 5), 
           legend.title = element_text(size = 6), 
           legend.key.size = unit(0.1, 'inches'),
@@ -266,6 +277,10 @@ single_model_plot_t <- create_plot_combined_truth(data_name = filenames_single,
                      title_text = "",
                      subtitle_text = "")
 single_model_plot_t
+
+m3 <- (single_model_plot_t / internist_merge_plot_t) 
+
+m4 <- (instruct_merge_plot_t / instruct02_merge_plot_t)
 ```
 
 ```{r}
@@ -273,6 +288,10 @@ ggsave(paste("single_model_plot_truth", ".png", sep = ""), plot = single_model_p
 ggsave(paste("instruct_merge_plot_truth", ".png", sep = ""), plot = instruct_merge_plot_t, path = "../plots")
 ggsave(paste("internist_merge_plot_truth", ".png", sep = ""), plot = internist_merge_plot_t, path = "../plots")
 ggsave(paste("instruct02_merge_plot_truth", ".png", sep = ""), plot = instruct02_merge_plot_t, path = "../plots")
+
+
+ggsave(paste("m3", ".png", sep = ""), plot = m3, path = "../plots")
+ggsave(paste("m4", ".png", sep = ""), plot = m4, path = "../plots")
 
 ```
 
