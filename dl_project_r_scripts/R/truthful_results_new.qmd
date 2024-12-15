@@ -17,6 +17,7 @@ library(dplyr)
 library(ggrepel)
 library(ggpattern)
 library(patchwork)
+library(xtable)
 ```
 
 ```{r}
@@ -190,23 +191,14 @@ single_model_plot
 
 ```{r}
 dir.create("../plots")
-# ggsave(paste("single_model_plot_new", ".eps"), plot = single_model_plot, device = cairo_ps, path = "../plots")
-ggsave(paste("instruct_merge_plot_new", ".eps"), plot = instruct_merge_plot, device = cairo_ps, path = "../plots")
-ggsave(paste("internist_merge_plot_new", ".eps"), plot = internist_merge_plot, device = cairo_ps, path = "../plots")
-ggsave(paste("instruct02_merge_plot_new", ".eps"), plot = instruct02_merge_plot, device = cairo_ps, path = "../plots")
+ggsave(paste("single_model_plot_new", ".png", sep = ""), plot = single_model_plot, path = "../plots")
+ggsave(paste("instruct_merge_plot_new", ".png", sep = ""), plot = instruct_merge_plot, path = "../plots")
+ggsave(paste("internist_merge_plot_new", ".png", sep = ""), plot = internist_merge_plot, path = "../plots")
+ggsave(paste("instruct02_merge_plot_new", ".png", sep = ""), plot = instruct02_merge_plot, path = "../plots")
 
 ```
 
 ```{r}
-combined_data_merge |>
-      filter(question_type == "QA prompt") |>
-      group_by(`Merged models`) |>
-      summarise(mean = mean(correct)) 
-
-combined_data_merge |>
-      filter(question_type == "Truthful prompt") |>
-      group_by(`Merged models`) |>
-      summarise(mean = mean(correct)) 
 
 ```
 
@@ -277,15 +269,45 @@ single_model_plot_t
 ```
 
 ```{r}
-combined_data_merge |>
+ggsave(paste("single_model_plot_truth", ".png", sep = ""), plot = single_model_plot_t, path = "../plots")
+ggsave(paste("instruct_merge_plot_truth", ".png", sep = ""), plot = instruct_merge_plot_t, path = "../plots")
+ggsave(paste("internist_merge_plot_truth", ".png", sep = ""), plot = internist_merge_plot_t, path = "../plots")
+ggsave(paste("instruct02_merge_plot_truth", ".png", sep = ""), plot = instruct02_merge_plot_t, path = "../plots")
+
+```
+
+
+```{r}
+a <- combined_data_merge |>
       filter(question_type == "QA prompt") |>
       group_by(`Merged models`) |>
-      summarise(mean = mean(truthful)) 
+      summarise(mean_qa_correct = mean(correct)) 
 
-
-combined_data_merge |>
+b <- combined_data_merge |>
       filter(question_type == "Truthful prompt") |>
       group_by(`Merged models`) |>
-      summarise(mean = mean(truthful)) 
+      summarise(mean_truth_correct = mean(correct)) 
+
+c <- combined_data_merge |>
+      filter(question_type == "QA prompt") |>
+      group_by(`Merged models`) |>
+      summarise(mean_qa_didnotknow = mean(truthful)) 
+
+
+d <- combined_data_merge |>
+      filter(question_type == "Truthful prompt") |>
+      group_by(`Merged models`) |>
+      summarise(mean_truth_didnotknow = mean(truthful)) 
+
+a <- left_join(a, b, by = "Merged models")
+b <- left_join(c, d, by = "Merged models")
+z <- left_join(a, b, by = "Merged models")
+z <- z |>
+  mutate(across(where(is.numeric), ~.x*100)) |>
+    mutate(across(where(is.numeric), ~round(.x, 2)))
+
+
+print(xtable(z, type = "latex"), file = "mean_truth_table.tex")
+
 ```
 
