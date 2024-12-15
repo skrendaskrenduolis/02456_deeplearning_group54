@@ -1,5 +1,5 @@
 ---
-title: "/usr/bin/time comparison of fastp thread changes"
+title: "analysis plots of model merging 02456 deep learning group 54"
 execute:
   echo: false
   eval: true
@@ -21,30 +21,38 @@ library(patchwork)
 
 ```{r}
 # load files
-filenames <- list.files("../../../dl_project_files/results_TruthfulQA/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames <- list.files("../../results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames
 
 
-filenames_truth <- list.files("../../../dl_project_files/results_TruthfulQA_fulltruth/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames_truth <- list.files("../../results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
 ```
 
 
+```{r}
+str_match("../../results_TruthfulQA_truthful_new/results_internistai-biomistral-ties_2_truthful.csv", "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful.csv")[2]
+```
 
 ```{r}
+# str match the trial number and add that as a row
 process_file <- function(file_path, truthful = FALSE) {
   if (truthful) {
-      `Merged models` <- str_match(file_path, "TruthfulQA_fulltruth\\/(?:results)_([^_]+)-fulltruth_ZeroShot_TruthfulQA_EN.csv")[2]
+      trial_nr <- str_match(file_path, "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful\\.csv")[3]
+      `Merged models` <- str_match(file_path, "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful\\.csv")[2]
       data <- read.csv(file_path)
       data <- data |>
-      mutate(`Merged models` = `Merged models`)
+      mutate(`Merged models` = `Merged models`) |>
+      mutate(trial = trial_nr)
   } else {
-      `Merged models` <- str_match(file_path, "TruthfulQA\\/(?:results)_([^_]+)_ZeroShot_TruthfulQA_EN.csv")[2]
+      trial_nr <- str_match(file_path, "results_TruthfulQA_new\\/results_([^_]+)_(\\d)\\.csv")[3]
+      `Merged models` <- str_match(file_path, "results_TruthfulQA_new\\/results_([^_]+)_(\\d)\\.csv")[2]
       data <- read.csv(file_path)
       data <- data |>
-      mutate(`Merged models` = `Merged models`)
+      mutate(`Merged models` = `Merged models`) |>
+      mutate(trial = trial_nr)
   }
   return(data)
 }
@@ -60,18 +68,21 @@ result_list_truth
 
 ```{r}
 combined_data <- bind_rows(result_list, .id = "source") |>
-  filter(category != "Statistics") |>
   rename(`Merged models` = `Merged models`) |>
-  mutate(truthful = "QA prompt") |>
-  select(question_id, `Merged models`, category, correct_letter, best_prediction, truthful)
+  mutate(question_type = "QA prompt") |>
+  select(question_id, `Merged models`, category, correct_letter, idk_letter, best_prediction, question_type, trial)
 
 combined_data_truth <- bind_rows(result_list_truth, .id = "source") |>
-  filter(category != "Statistics") |>
   rename(`Merged models` = `Merged models`) |>
-  mutate(truthful = "Truthful prompt") |>
-  select(question_id,  `Merged models`, category, correct_letter, best_prediction, truthful)
+  mutate(question_type = "Truthful prompt") |>
+  select(question_id,  `Merged models`, category, correct_letter, idk_letter, best_prediction, question_type, trial)
 
-combined_data_merge <- bind_rows(combined_data, combined_data_truth)
+combined_data_merge <- bind_rows(combined_data, combined_data_truth) |>
+  filter(trial == 0) |>
+  select(!trial) |>
+      mutate(correct = ifelse(correct_letter == best_prediction | idk_letter == best_prediction, 1, 0)) |>
+      mutate(truthful = ifelse(idk_letter == best_prediction, 1, 0))
+  
 ```
 
 ```{r}
@@ -97,7 +108,7 @@ filenames_single <- combined_data_merge |>
   select(`Merged models`) |>
   unique() |>
   filter(str_detect(`Merged models`, "BioMistral-7B-Instruct") |
-           str_detect(`Merged models`, "internistai-7b") |
+           str_detect(`Merged models`, "base") |
            str_detect(`Merged models`, "Mistral-7B")) |>
   pull()
 
@@ -110,26 +121,25 @@ filenames_single
 
 ```{r}
 # SINGLE PLOT
-combined_data_merge |> group_by(truthful)
+combined_data_merge |> group_by(question_type)
 
 create_plot_combined <- function(data_name, data_tibble, title_text, subtitle_text) {
 
   plot_obj <- data_tibble |>
-      mutate(correct = ifelse(correct_letter == best_prediction, 1, 0)) |>
       filter(`Merged models` %in% data_name) |>
       mutate(correct_percent = correct*100) |>
-      ggbarplot(x = "category", y = "correct_percent", fill = "Merged models", alpha = 0.4, facet.by = "truthful",
+      ggbarplot(x = "category", y = "correct_percent", fill = "Merged models", alpha = 0.4, facet.by = "question_type",
               x.text.angle = 35,
               lab.vjust = -0.25,
               height = 0.5,
               xlab = "Category",
-              ylab = "Truthfulness",
+              ylab = "Correctness %",
               lab.nb.digits = 1,
               palette = "Set1",
               position = position_dodge(0.85),
               add = c("mean"),
               label = FALSE, lab.size = 2.5) |>
-        facet(facet.by = "truthful") +
+        facet(facet.by = "question_type") +
     theme(axis.text.x = element_text(size = 8)) +
     theme(legend.text = element_text(size = 5), 
           legend.title = element_text(size = 6), 
@@ -189,10 +199,93 @@ ggsave(paste("instruct02_merge_plot_new", ".eps"), plot = instruct02_merge_plot,
 
 ```{r}
 combined_data_merge |>
-      mutate(correct = ifelse(correct_letter == best_prediction, 1, 0)) |>
-      filter(truthful == "QA prompt") |>
-  group_by(`Merged models`) |>
-      summarise(mean = mean(correct)) |>
-      filter(truthful == "QA prompt")
+      filter(question_type == "QA prompt") |>
+      group_by(`Merged models`) |>
+      summarise(mean = mean(correct)) 
+
+combined_data_merge |>
+      filter(question_type == "Truthful prompt") |>
+      group_by(`Merged models`) |>
+      summarise(mean = mean(correct)) 
+
+```
+
+```{r}
+combined_data_merge |> group_by(question_type)
+
+create_plot_combined_truth <- function(data_name, data_tibble, title_text, subtitle_text) {
+
+  plot_obj <- data_tibble |>
+      filter(`Merged models` %in% data_name) |>
+      mutate(truthful_percent = truthful*100) |>
+      ggbarplot(x = "category", y = "truthful_percent", fill = "Merged models", alpha = 0.4, facet.by = "question_type",
+              x.text.angle = 35,
+              lab.vjust = -0.25,
+              height = 0.5,
+              xlab = "Category",
+              ylab = "Unknown answer %",
+              lab.nb.digits = 1,
+              palette = "Set1",
+              position = position_dodge(0.85),
+              add = c("mean"),
+              label = FALSE, lab.size = 2.5) |>
+        facet(facet.by = "question_type") +
+    theme(axis.text.x = element_text(size = 8)) +
+    theme(legend.text = element_text(size = 5), 
+          legend.title = element_text(size = 6), 
+          legend.key.size = unit(0.1, 'inches'),
+          legend.position = "right",
+          plot.margin = unit(c(0, 0, 0, 0), 
+                                "inches")) +
+  guides(fill = guide_legend(nrow = 6)) +
+    plot_annotation(title = title_text,
+                           subtitle = subtitle_text)  &
+      theme(plot.subtitle = element_text(size = 10)) + labs_pubr() + grids(linetype = "dashed")
+  
+    return(plot_obj)
+
+}
+```
+
+```{r}
+# Not truthful data
+internist_merge_plot_t <- create_plot_combined_truth(data_name = filenames_internist,
+                     data_tibble = combined_data_merge,
+                     title_text = "",
+                     subtitle_text = "")
+internist_merge_plot_t
+
+
+instruct_merge_plot_t <- create_plot_combined_truth(data_name =  filenames_instruct,
+                     data_tibble = combined_data_merge,
+                     title_text = "",
+                     subtitle_text = "")
+instruct_merge_plot_t
+
+instruct02_merge_plot_t <- create_plot_combined_truth(data_name =  filenames_instruct_02,
+                     data_tibble = combined_data_merge,
+                     title_text = "",
+                     subtitle_text = "")
+instruct02_merge_plot_t
+
+
+single_model_plot_t <- create_plot_combined_truth(data_name = filenames_single,
+                     data_tibble = combined_data_merge,
+                     title_text = "",
+                     subtitle_text = "")
+single_model_plot_t
+```
+
+```{r}
+combined_data_merge |>
+      filter(question_type == "QA prompt") |>
+      group_by(`Merged models`) |>
+      summarise(mean = mean(truthful)) 
+
+
+combined_data_merge |>
+      filter(question_type == "Truthful prompt") |>
+      group_by(`Merged models`) |>
+      summarise(mean = mean(truthful)) 
 ```
 
