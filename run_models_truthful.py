@@ -55,7 +55,8 @@ def process(data):
             "category": current_data["category"],
             "correct_letter": current_data["correct_letter"],
             "predictions": predictions,
-            "best_prediction": token_str[0],
+            "idk_letter": current_data["idk_letter"],
+            "best_prediction": token_str[0]
         })
     
     return results
@@ -94,7 +95,7 @@ for i in range(0,3):
 
             input_ids = inputs["input_ids"].to("cuda")
             outputs = model.generate(input_ids, max_new_tokens=1, output_scores=True, return_dict_in_generate=True)
-            data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "classes": d["classes"]})
+            data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "idk_letter": d["idk_answer"], "classes": d["classes"]})
 
     data_batches = list(divide_chunks(data_threads, THREADS_NBR))
 
@@ -128,7 +129,7 @@ for i in range(0,3):
 
             input_ids = inputs["input_ids"].to("cuda")
             outputs = model.generate(input_ids, max_new_tokens=1, output_scores=True, return_dict_in_generate=True)
-            data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "classes": d["classes"]})
+            data_threads.append({"scores": outputs.scores[0].to("cpu"), "question_id":d["question_id"], "category": d["category"], "correct_letter": d["correct_answer"], "idk_letter": d["idk_answer"], "classes": d["classes"]})
 
 
     data_batches = list(divide_chunks(data_threads, THREADS_NBR))

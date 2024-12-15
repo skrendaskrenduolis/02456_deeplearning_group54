@@ -5,3 +5,6 @@ retired_scripts/
 results_TruthfulQA_new/
 results_TruthfulQA_truthful_new/
 __pycache__/
+run_models_time
+truthful_qa_complete.err
+truthful_qa_complete.out
