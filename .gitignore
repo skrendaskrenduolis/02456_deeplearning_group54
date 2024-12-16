@@ -1,0 +1,11 @@
+run_truthful_qa_predict_local.sh
+local_truthful_qa_predict.sh
+.Rproj.user
+retired_scripts/
+results_TruthfulQA_new/
+results_TruthfulQA_truthful_new/
+__pycache__/
+run_models_time
+truthful_qa_complete.err
+truthful_qa_complete.out
+dl_project_r_scripts/R/mean_truth_table.tex
