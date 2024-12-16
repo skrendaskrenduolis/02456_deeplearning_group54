@@ -1,0 +1,17 @@
+
+slices:
+  - sources:
+      - model: /dtu/blackhole/0d/214285/models/save/mistralai_Mistral-7B-Instruct-v0.1
+        layer_range: [0, 32]
+      - model: /dtu/blackhole/0d/214285/models/save/BioMistral_BioMistral-7B
+        layer_range: [0, 32]
+merge_method: slerp
+base_model: /dtu/blackhole/0d/214285/models/save/mistralai_Mistral-7B-Instruct-v0.1
+parameters:
+  t:
+    - filter: self_attn
+      value: [0, 0.5, 0.3, 0.7, 1]
+    - filter: mlp
+      value: [1, 0.5, 0.7, 0.3, 0]
+    - value: 0.5
+dtype: bfloat16

@@ -1,0 +1,12 @@
+
+models:
+  - model: /dtu/blackhole/0d/214285/models/save/mistralai_Mistral-7B-Instruct-v0.1
+  - model: /dtu/blackhole/0d/214285/models/save/BioMistral_BioMistral-7B
+    parameters:
+      density: 0.5
+      weight: 0.5
+merge_method: ties
+base_model: /dtu/blackhole/0d/214285/models/save/mistralai_Mistral-7B-Instruct-v0.1
+parameters:
+  normalize: true
+dtype: bfloat16

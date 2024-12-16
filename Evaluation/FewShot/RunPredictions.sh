@@ -1,0 +1,6 @@
+MODEL_SAVE_PATH="/dtu/blackhole/0d/214285/models/save"
+python PredictFewShot-Avg-Thread.py --model_name="$MODEL_SAVE_PATH/BioMistral_BioMistral-7B"
+python PredictFewShot-Avg-Thread.py --model_name="$MODEL_SAVE_PATH/mistralai_Mistral-7B-Instruct-v0.1"
+python PredictFewShot-Avg-Thread.py --model_name="$MODEL_SAVE_PATH/BioMistral-7B-mistral7instruct-dare"
+python PredictFewShot-Avg-Thread.py --model_name="$MODEL_SAVE_PATH/BioMistral-7B-mistral7instruct-slerp"
+python PredictFewShot-Avg-Thread.py --model_name="$MODEL_SAVE_PATH/BioMistral-7B-mistral7instruct-ties"
