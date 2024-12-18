@@ -11,6 +11,7 @@ Run `FinalNotebook.ipynb` for complete process replication
 Ensure that in the `Evaluation` folder `merge_models.sh` and `run_truthful_predict.sh` have desired/correct paths and env variables for conda environments and huggingface directories
  
 Truthfulness evaluation summary:
+
 `merge_models.sh`
    - Runs `merge-kit` to merge models
 `run_truthful_predict.sh`
