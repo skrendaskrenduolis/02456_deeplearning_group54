@@ -1,7 +1,8 @@
 Group 54 - 02456 Deep Learning project - Model merging
-
 Group members:
 Martynas Baltušis (s222858), Yayi Wang (s243559), Alexander Pittas (s230265), Patrik Suchopa (s241943)
+
+Poster available as .pdf in the repo.
 
 Run `Final_notebook.ipynb` for complete process replication
 Ensure that in the `Evaluation` folder `merge_models.sh` and `run_truthful_predict.sh` have desired/correct paths and env variables for conda environments and huggingface directories
