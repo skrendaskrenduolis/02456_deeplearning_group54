@@ -12,9 +12,10 @@ Ensure that in the `Evaluation` folder `merge_models.sh` and `run_truthful_predi
  
 Truthfulness evaluation summary:
 
-`merge_models.sh`
+- `merge_models.sh`
    - Runs `merge-kit` to merge models
-`run_truthful_predict.sh`
+  
+- `run_truthful_predict.sh`
   - Runs `run_models_truthful.py`
     - Calls `edit_dataset_improved.py` to preprocess the TruthfulQA dataset
 - `json_to_csv.py`
