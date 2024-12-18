@@ -22,19 +22,19 @@ library(xtable)
 
 ```{r}
 # load files
-filenames <- list.files("../../results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames <- list.files("../../Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames
 
 
-filenames_truth <- list.files("../../results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames_truth <- list.files("../../Datasets/results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
 ```
 
 
 ```{r}
-str_match("../../results_TruthfulQA_truthful_new/results_internistai-biomistral-ties_2_truthful.csv", "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful.csv")[2]
+str_match("../../Datasets/results_TruthfulQA_truthful_new/results_internistai-biomistral-ties_2_truthful.csv", "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful.csv")[2]
 ```
 
 ```{r}
