@@ -1,0 +1,14 @@
+models:
+  - model: internistai/base-7b-v0.2
+    parameters:
+      density: 0.5
+      weight: 0.5
+  - model: BioMistral/BioMistral-7B
+    parameters:
+      density: 0.5
+      weight: 0.5
+merge_method: dare_ties
+base_model: mistralai/Mistral-7B-v0.2
+parameters:
+  normalize: true
+dtype: bfloat16

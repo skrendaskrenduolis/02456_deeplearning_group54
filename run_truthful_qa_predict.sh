@@ -27,11 +27,13 @@
 # Load the cuda module
 module load cuda/12.4
 
+# Activate your conda env (modify path if necessary)
 source ~/miniconda3/bin/activate
-conda activate /work3/s222858/deeplearning
+conda activate $PWD/../deeplearning
 
-export HF_HOME="/work3/s222858/huggingface"
-export HF_HUB_CACHE="/work3/s222858/huggingface/hub"
+# Export huggingface variables if necessary
+export HF_HOME="$PWD/../huggingface"
+export HF_HUB_CACHE="$PWD/../huggingface/hub"
 
 for file in $(ls $HF_HUB_CACHE | grep 'biomistral_instruct_*'); do
     echo "$HF_HUB_CACHE/$file"
@@ -48,3 +50,5 @@ for model in "${single_model_array[@]}"; do
     echo "$model"
     python3 run_models_truthful.py --model_name="$model"
 done
+
+conda deactivate
