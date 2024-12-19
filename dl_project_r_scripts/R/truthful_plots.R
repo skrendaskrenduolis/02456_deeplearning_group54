@@ -1,6 +1,6 @@
 #load libraries
 #install.packages(c("tidyverse", "ggpubr", "patchwork", "dplyr", "ggrepel", "ggpattern", "patchwork", "xtable"))
-
+library(tidyverse)
 library(ggpubr)
 library(patchwork)
 library(dplyr)
@@ -13,12 +13,12 @@ library(xtable)
 workdir = getwd()
 workdir
 # load files
-filenames <- list.files("Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames <- list.files("Datasets/results_TruthfulQA_new", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames
 
 
-filenames_truth <- list.files("Datasets/results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames_truth <- list.files("Datasets/results_TruthfulQA_truthful_new", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
 
