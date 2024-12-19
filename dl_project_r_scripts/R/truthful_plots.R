@@ -1,0 +1,303 @@
+  title: "analysis plots of model merging 02456 deep learning group 54"
+execute:
+  echo: false
+eval: true
+format: html
+editor:
+  markdown:
+  wrap: 80
+
+#load libraries
+library(tidyverse)
+library(ggpubr)
+library(patchwork)
+library(dplyr)
+library(ggrepel)
+library(ggpattern)
+library(patchwork)
+library(xtable)
+
+# load files
+filenames <- list.files("../../Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+
+filenames
+
+
+filenames_truth <- list.files("../../Datasets/results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+
+filenames_truth
+```
+
+
+
+
+# str match the trial number and add that as a row
+process_file <- function(file_path, truthful = FALSE) {
+  if (truthful) {
+    trial_nr <- str_match(file_path, "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful\\.csv")[3]
+    `Merged models` <- str_match(file_path, "results_TruthfulQA_truthful_new\\/results_([^_]+)_(\\d)_truthful\\.csv")[2]
+    data <- read.csv(file_path)
+    data <- data |>
+      mutate(`Merged models` = `Merged models`) |>
+      mutate(trial = trial_nr)
+  } else {
+    trial_nr <- str_match(file_path, "results_TruthfulQA_new\\/results_([^_]+)_(\\d)\\.csv")[3]
+    `Merged models` <- str_match(file_path, "results_TruthfulQA_new\\/results_([^_]+)_(\\d)\\.csv")[2]
+    data <- read.csv(file_path)
+    data <- data |>
+      mutate(`Merged models` = `Merged models`) |>
+      mutate(trial = trial_nr)
+  }
+  return(data)
+}
+
+
+result_list <- lapply(filenames, process_file)
+result_list_truth <- lapply(filenames_truth, process_file, truthful = TRUE)
+
+result_list
+result_list_truth
+
+
+combined_data <- bind_rows(result_list, .id = "source") |>
+  rename(`Merged models` = `Merged models`) |>
+  mutate(question_type = "QA prompt") |>
+  select(question_id, `Merged models`, category, correct_letter, idk_letter, best_prediction, question_type, trial)
+
+combined_data_truth <- bind_rows(result_list_truth, .id = "source") |>
+  rename(`Merged models` = `Merged models`) |>
+  mutate(question_type = "Truthful prompt") |>
+  select(question_id,  `Merged models`, category, correct_letter, idk_letter, best_prediction, question_type, trial)
+
+combined_data_merge <- bind_rows(combined_data, combined_data_truth) |>
+  filter(trial == 0) |>
+  select(!trial) |>
+  mutate(correct = ifelse(correct_letter == best_prediction | idk_letter == best_prediction, 1, 0)) |>
+  mutate(truthful = ifelse(idk_letter == best_prediction, 1, 0))
+
+
+filenames_instruct <- combined_data_merge |>
+  select(`Merged models`) |>
+  unique() |>
+  filter(str_detect(`Merged models`, "biomistral-instruct-")) |>
+  pull()
+
+filenames_instruct_02 <- combined_data_merge |>
+  select(`Merged models`) |>
+  unique() |>
+  filter(str_detect(`Merged models`, "biomistral-instruct02")) |>
+  pull()
+
+filenames_internist <- combined_data_merge |>
+  select(`Merged models`) |>
+  unique() |>
+  filter(str_detect(`Merged models`, "internistai-biomistral")) |>
+  pull()
+
+filenames_single <- combined_data_merge |>
+  select(`Merged models`) |>
+  unique() |>
+  filter(str_detect(`Merged models`, "BioMistral-7B-Instruct") |
+           str_detect(`Merged models`, "base") |
+           str_detect(`Merged models`, "Mistral-7B")) |>
+  pull()
+
+filenames_instruct
+filenames_instruct_02
+filenames_internist
+filenames_single
+
+
+
+# SINGLE PLOT
+combined_data_merge |> group_by(question_type)
+
+create_plot_combined <- function(data_name, data_tibble, title_text, subtitle_text) {
+  
+  plot_obj <- data_tibble |>
+    filter(`Merged models` %in% data_name) |>
+    mutate(correct_percent = correct*100) |>
+    ggbarplot(x = "category", y = "correct_percent", fill = "Merged models", alpha = 0.4, facet.by = "question_type",
+              x.text.angle = 35,
+              lab.vjust = -0.25,
+              height = 0.5,
+              xlab = "Category",
+              ylab = "Correctness %",
+              lab.nb.digits = 1,
+              palette = "Set1",
+              position = position_dodge(0.85),
+              add = c("mean"),
+              label = FALSE, lab.size = 2.5) |>
+    facet(facet.by = "question_type") +
+    theme(axis.text.x = element_text(size = 5),
+          axis.text.y = element_text(size = 5)) +
+    theme(legend.text = element_text(size = 5), 
+          legend.title = element_text(size = 6), 
+          legend.key.size = unit(0.1, 'inches'),
+          legend.position = "right",
+          plot.margin = unit(c(0, 0, 0, 0), 
+                             "inches")) +
+    guides(fill = guide_legend(nrow = 6)) +
+    plot_annotation(title = title_text,
+                    subtitle = subtitle_text)  &
+    theme(plot.subtitle = element_text(size = 10)) + labs_pubr() + grids(linetype = "dashed")
+  
+  return(plot_obj)
+  
+}
+
+
+# Not truthful data
+internist_merge_plot <- create_plot_combined(data_name = filenames_internist,
+                                             data_tibble = combined_data_merge,
+                                             title_text = "",
+                                             subtitle_text = "")
+internist_merge_plot
+
+
+instruct_merge_plot <- create_plot_combined(data_name =  filenames_instruct,
+                                            data_tibble = combined_data_merge,
+                                            title_text = "",
+                                            subtitle_text = "")
+instruct_merge_plot
+
+instruct02_merge_plot <- create_plot_combined(data_name =  filenames_instruct_02,
+                                              data_tibble = combined_data_merge,
+                                              title_text = "",
+                                              subtitle_text = "")
+instruct02_merge_plot
+
+
+single_model_plot <- create_plot_combined(data_name = filenames_single,
+                                          data_tibble = combined_data_merge,
+                                          title_text = "",
+                                          subtitle_text = "")
+single_model_plot
+
+m1 <- (single_model_plot / internist_merge_plot)
+
+m2 <- (instruct_merge_plot / instruct02_merge_plot)
+```
+
+
+
+dir.create("../plots")
+ggsave(paste("single_model_plot_new", ".png", sep = ""), plot = single_model_plot, path = "../plots")
+ggsave(paste("instruct_merge_plot_new", ".png", sep = ""), plot = instruct_merge_plot, path = "../plots")
+ggsave(paste("internist_merge_plot_new", ".png", sep = ""), plot = internist_merge_plot, path = "../plots")
+ggsave(paste("instruct02_merge_plot_new", ".png", sep = ""), plot = instruct02_merge_plot, path = "../plots")
+
+
+ggsave(paste("m1", ".png", sep = ""), plot = m1, path = "../plots")
+ggsave(paste("m2", ".png", sep = ""), plot = m2, path = "../plots")
+
+
+
+combined_data_merge |> group_by(question_type)
+
+create_plot_combined_truth <- function(data_name, data_tibble, title_text, subtitle_text) {
+  
+  plot_obj <- data_tibble |>
+    filter(`Merged models` %in% data_name) |>
+    mutate(truthful_percent = truthful*100) |>
+    ggbarplot(x = "category", y = "truthful_percent", fill = "Merged models", alpha = 0.4, facet.by = "question_type",
+              x.text.angle = 35,
+              lab.vjust = -0.25,
+              height = 0.5,
+              xlab = "Category",
+              ylab = "Unknown answer %",
+              lab.nb.digits = 1,
+              palette = "Set1",
+              position = position_dodge(0.85),
+              add = c("mean"),
+              label = FALSE, lab.size = 2.5) |>
+    facet(facet.by = "question_type") +
+    theme(axis.text.x = element_text(size = 5),
+          axis.text.y = element_text(size = 5)) +
+    theme(legend.text = element_text(size = 5), 
+          legend.title = element_text(size = 6), 
+          legend.key.size = unit(0.1, 'inches'),
+          legend.position = "right",
+          plot.margin = unit(c(0, 0, 0, 0), 
+                             "inches")) +
+    guides(fill = guide_legend(nrow = 6)) +
+    plot_annotation(title = title_text,
+                    subtitle = subtitle_text)  &
+    theme(plot.subtitle = element_text(size = 10)) + labs_pubr() + grids(linetype = "dashed")
+  
+  return(plot_obj)
+  
+}
+
+# Not truthful data
+internist_merge_plot_t <- create_plot_combined_truth(data_name = filenames_internist,
+                                                     data_tibble = combined_data_merge,
+                                                     title_text = "",
+                                                     subtitle_text = "")
+internist_merge_plot_t
+
+
+instruct_merge_plot_t <- create_plot_combined_truth(data_name =  filenames_instruct,
+                                                    data_tibble = combined_data_merge,
+                                                    title_text = "",
+                                                    subtitle_text = "")
+instruct_merge_plot_t
+
+instruct02_merge_plot_t <- create_plot_combined_truth(data_name =  filenames_instruct_02,
+                                                      data_tibble = combined_data_merge,
+                                                      title_text = "",
+                                                      subtitle_text = "")
+instruct02_merge_plot_t
+
+
+single_model_plot_t <- create_plot_combined_truth(data_name = filenames_single,
+                                                  data_tibble = combined_data_merge,
+                                                  title_text = "",
+                                                  subtitle_text = "")
+single_model_plot_t
+
+m3 <- (single_model_plot_t / internist_merge_plot_t) 
+
+m4 <- (instruct_merge_plot_t / instruct02_merge_plot_t)
+
+ggsave(paste("single_model_plot_truth", ".png", sep = ""), plot = single_model_plot_t, path = "../plots")
+ggsave(paste("instruct_merge_plot_truth", ".png", sep = ""), plot = instruct_merge_plot_t, path = "../plots")
+ggsave(paste("internist_merge_plot_truth", ".png", sep = ""), plot = internist_merge_plot_t, path = "../plots")
+ggsave(paste("instruct02_merge_plot_truth", ".png", sep = ""), plot = instruct02_merge_plot_t, path = "../plots")
+
+
+ggsave(paste("m3", ".png", sep = ""), plot = m3, path = "../plots")
+ggsave(paste("m4", ".png", sep = ""), plot = m4, path = "../plots")
+
+
+a <- combined_data_merge |>
+  filter(question_type == "QA prompt") |>
+  group_by(`Merged models`) |>
+  summarise(mean_qa_correct = mean(correct)) 
+
+b <- combined_data_merge |>
+  filter(question_type == "Truthful prompt") |>
+  group_by(`Merged models`) |>
+  summarise(mean_truth_correct = mean(correct)) 
+
+c <- combined_data_merge |>
+  filter(question_type == "QA prompt") |>
+  group_by(`Merged models`) |>
+  summarise(mean_qa_didnotknow = mean(truthful)) 
+
+
+d <- combined_data_merge |>
+  filter(question_type == "Truthful prompt") |>
+  group_by(`Merged models`) |>
+  summarise(mean_truth_didnotknow = mean(truthful)) 
+
+a <- left_join(a, b, by = "Merged models")
+b <- left_join(c, d, by = "Merged models")
+z <- left_join(a, b, by = "Merged models")
+z <- z |>
+  mutate(across(where(is.numeric), ~.x*100)) |>
+  mutate(across(where(is.numeric), ~round(.x, 2)))
+
+
+print(xtable(z, type = "latex"), file = "mean_truth_table.tex")
+
