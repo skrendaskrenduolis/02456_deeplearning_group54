@@ -20,6 +20,7 @@ Truthfulness evaluation summary:
     - Calls `edit_dataset_improved.py` to preprocess the TruthfulQA dataset
 - `json_to_csv.py`
   - Generates .csv files (there were issues with using JSON in R for plots)
-- `dl_project_scripts/R/truthful_results_new.qmd`
-  - Creates plots used in report
+- `dl_project_scripts/truthful_R_launch.sh`
+  - Runs `Rscript dl_project_scripts/R/truthful_plots.R`
+  - Creates plots used in report (.qmd file `truthful_results_new.qmd` also exists if preferred)
   
