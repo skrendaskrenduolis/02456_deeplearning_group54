@@ -9,15 +9,16 @@ library(ggpattern)
 library(patchwork)
 library(xtable)
 
-setwd("dl_project_R_scripts/R")
-
+#setwd("dl_project_R_scripts/R")
+workdir = getwd()
+workdir
 # load files
-filenames <- list.files("../../Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames <- list.files("Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames
 
 
-filenames_truth <- list.files("../../Datasets/results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
+filenames_truth <- list.files("Datasets/results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
 

@@ -82,7 +82,7 @@ else:
 
 
 torch.set_default_device("cuda")
-for i in range(0,3):
+for i in [0]:
     ## Run normal variation
     seed()
 
