@@ -1,7 +1,8 @@
 import pandas as pd
 import os
 
-path_list = ["../../Datasets/results_TruthfulQA_new", "../../Datasets/results_TruthfulQA_truthful_new"]
+current_dir = os.getcwd()
+path_list = [f"{current_dir}/Datasets/results_TruthfulQA_new", f"{current_dir}/Datasets/results_TruthfulQA_truthful_new"]
 
 for path in path_list:
     for file in os.listdir(path):

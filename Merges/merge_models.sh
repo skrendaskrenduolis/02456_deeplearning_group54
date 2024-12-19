@@ -29,14 +29,14 @@ module load cuda/12.4
 
 
 source ~/miniconda3/bin/activate
-conda activate $PWD/../deeplearning
+#conda activate $PWD/../deeplearning
 
-export HF_HOME="$PWD/../huggingface"
+#export HF_HOME="$PWD/../huggingface"
 
-for file in "$PWD/truthful_merges"/*; do
+for file in "$PWD/Merges/truthful_merges"/*; do
     name=$(echo "$file" | gawk -F "/" '{sub(/\.yml$/, "", $NF); print $NF}')
     echo $name
-    mergekit-yaml "$PWD/truthful_merges/$name.yml" "$HF_HOME/hub/$name/" --cuda
+    mergekit-yaml "$PWD/Merges/truthful_merges/$name.yml" "$HF_HOME/hub/$name/" --cuda
 done
 
-conda deactivate
+#conda deactivate

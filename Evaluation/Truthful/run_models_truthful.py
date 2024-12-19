@@ -16,7 +16,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaTokenizer, Ll
 
 # import dataset matched to replicate paper
 # FIX UNRESOLVED IMPORT
-from Evaluation.Truthful.edit_dataset_improved import merged_dataset, merged_dataset_truthful
+from edit_dataset_improved import merged_dataset, merged_dataset_truthful
 
 parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFormatter)
 parser.add_argument("--model_name", type=str, required=True, help="HuggingFace Hub / Local model name")
