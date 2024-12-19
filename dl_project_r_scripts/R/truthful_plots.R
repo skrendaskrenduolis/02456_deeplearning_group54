@@ -1,5 +1,6 @@
 #load libraries
-library(tidyverse)
+install.packages(c("tidyverse", "ggpubr", "patchwork", "dplyr", "ggrepel", "ggpattern", "patchwork", "xtable"))
+
 library(ggpubr)
 library(patchwork)
 library(dplyr)
@@ -7,6 +8,7 @@ library(ggrepel)
 library(ggpattern)
 library(patchwork)
 library(xtable)
+
 
 # load files
 filenames <- list.files("../../Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
