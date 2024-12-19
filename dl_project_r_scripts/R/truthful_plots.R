@@ -1,12 +1,3 @@
-  title: "analysis plots of model merging 02456 deep learning group 54"
-execute:
-  echo: false
-eval: true
-format: html
-editor:
-  markdown:
-  wrap: 80
-
 #load libraries
 library(tidyverse)
 library(ggpubr)
@@ -26,8 +17,6 @@ filenames
 filenames_truth <- list.files("../../Datasets/results_TruthfulQA_truthful_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
 
 filenames_truth
-```
-
 
 
 
@@ -177,7 +166,7 @@ single_model_plot
 m1 <- (single_model_plot / internist_merge_plot)
 
 m2 <- (instruct_merge_plot / instruct02_merge_plot)
-```
+
 
 
 
