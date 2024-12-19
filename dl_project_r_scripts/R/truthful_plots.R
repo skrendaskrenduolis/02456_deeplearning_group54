@@ -9,6 +9,8 @@ library(ggpattern)
 library(patchwork)
 library(xtable)
 
+print(utils::getSrcFilename(function(){}, full.names = TRUE))
+setwd(getSrcDirectory(function(){})[1])
 
 # load files
 filenames <- list.files("../../Datasets/results_TruthfulQA_new/", recursive = TRUE, full.names = TRUE, pattern = '.csv$')
