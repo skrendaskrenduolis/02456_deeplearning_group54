@@ -107,7 +107,7 @@ for i in [0]:
         all_results.extend(thread_result)
     print("Total elements processed: ", len(all_results))
 
-    dir_name = "../../Datasets/results_TruthfulQA_new"
+    dir_name = "Datasets/results_TruthfulQA_new"
 
     if not os.path.exists(dir_name):
         # if tmp exists and was not removed, remove it
@@ -142,7 +142,7 @@ for i in [0]:
         all_results.extend(thread_result)
     print("Total elements processed: ", len(all_results))
 
-    dir_name = "../../Datasets/results_TruthfulQA_truthful_new"
+    dir_name = "Datasets/results_TruthfulQA_truthful_new"
 
     if not os.path.exists(dir_name):
         # if tmp exists and was not removed, remove it

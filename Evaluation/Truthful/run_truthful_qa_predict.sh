@@ -30,12 +30,12 @@ module load cuda/12.4
 # Activate your conda env (modify path if necessary)
 source ~/miniconda3/bin/activate
 
-#conda activate $PWD/../deeplearning
+conda activate $PWD/../deeplearning
 
 # Export huggingface variables if necessary
 
-# export HF_HOME="$PWD/../huggingface"
-# export HF_HUB_CACHE="$PWD/../huggingface/hub"
+export HF_HOME="$PWD/../huggingface"
+export HF_HUB_CACHE="$PWD/../huggingface/hub"
 
 for file in $(ls $HF_HUB_CACHE | grep 'biomistral_instruct_*'); do
     echo "$HF_HUB_CACHE/$file"
