@@ -2,7 +2,7 @@ Group 54 - 02456 Deep Learning project - Model merging
 
 Group members:
 
-Martynas Baltušis (s222858), Yayi Wang (s243559), Alexander Pittas (s230265), Patrik Suchopa (s241943)
+Martynas Baltušis (s222858)(repo creator), Yayi Wang (s243559), Alexander Pittas (s230265), Patrik Suchopa (s241943)
 
 Poster available as .pdf in the repo.
 
