@@ -29,9 +29,9 @@ module load cuda/12.4
 
 
 source ~/miniconda3/bin/activate
-conda activate $PWD/../deeplearning
+# conda activate $PWD/../deeplearning
 
-export HF_HOME="$PWD/../huggingface"
+# export HF_HOME="$PWD/../huggingface"
 
 for file in "$PWD/Merges/truthful_merges"/*; do
     name=$(echo "$file" | gawk -F "/" '{sub(/\.yml$/, "", $NF); print $NF}')
